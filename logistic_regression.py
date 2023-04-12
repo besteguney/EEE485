@@ -32,10 +32,11 @@ class LogisticRegression:
         self.weight = self.weight - self.learning_rate * self.rss()
         return
 
-    def prediction(self, features):
+    def fit(self, xtrain, ytrain):
         for index in range(self.iteration):
             self.gradient_descent()
+    
+    def predict(self, features):
         prediction = features @ self.weight
         self.sigmoid(prediction)
-        #prediction = self.classify(prediction)
         return prediction
