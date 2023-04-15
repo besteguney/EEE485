@@ -5,8 +5,6 @@ import seaborn as sns
 import math
 
 # Class for the methods of PCA process. This applied to reduce the dimension of the original data.
-
-# 2. PCA
 class PCA:
     
     def __init__(self, features):
@@ -26,7 +24,6 @@ class PCA:
         sorted_index = np.argsort(self.eigen_vals)[::-1]
         sorted_eigen_val = self.eigen_vals[sorted_index]
         sorted_eigen_vec = self.eigen_vecs[:,sorted_index]
-        print(sorted_eigen_vec.shape)
         eigenvector_subset = sorted_eigen_vec[:,0:component_count]
         return eigenvector_subset
 

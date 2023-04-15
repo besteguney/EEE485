@@ -48,7 +48,6 @@ class NaiveBayes:
 
         return numerator / denominator
 
-
     def mse(self, ypredict, ytest):
         score = 0
         for index in range(ypredict.shape[0]):
@@ -67,7 +66,7 @@ class NaiveBayes:
         x_matrix = df.iloc[:, :-1].values
         x_matrix = x_matrix.astype(float)
         y_vector = df.iloc[:, -1:].values
-        print('yvector', y_vector.shape)
+
         while current_fold > 0:
             xtest = x_matrix[start_row:start_row + fold_size]
             ytest = y_vector[start_row:start_row + fold_size]
