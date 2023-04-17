@@ -51,7 +51,14 @@ class NaiveBayes:
     def mse(self, ypredict, ytest):
         score = 0
         for index in range(ypredict.shape[0]):
-            if ypredict[index] != ytest[index][0]:
+            if ypredict[index][0] != ytest[index][0]:
+                score = score + 1
+        return score / ypredict.shape[0]
+
+    def accuracy(self, ypredict, ytest):
+        score = 0
+        for index in range(ypredict.shape[0]):
+            if ypredict[index][0] == ytest[index][0]:
                 score = score + 1
         return score / ypredict.shape[0]
 

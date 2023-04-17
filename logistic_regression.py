@@ -33,7 +33,7 @@ class LogisticRegression:
 
         if self.is_regularized:
             if self.regular_type == 2:
-                return ((features.T @ (prediction - labels)) + (self.tune_param * (weight.T @ weight) )) / sample_size
+                return ((features.T @ (prediction - labels)) + (self.tune_param * np.sum(weight) )) / sample_size
             else:
                 return ((features.T @ (prediction - labels)) + (self.tune_param * np.sum(np.abs(weight))) ) / sample_size
         return (features.T @ (prediction - labels)) / sample_size

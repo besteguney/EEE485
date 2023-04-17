@@ -27,4 +27,20 @@ class KNN:
             neigbor_count[val] = neigbor_count[val] + 1
         return np.argmax(neigbor_count)
     
+    def accuracy(self, ypredict, ytest):
+        score = 0
+        for index in range(ypredict.shape[0]):
+            if ypredict[index] == ytest[index]:
+                score = score + 1
+        return score / ypredict.shape[0]
+    
+    def min_max_scaling(self, xtrain):
+        X = xtrain.copy()
+
+        for index in range(X.shape[1]):
+            min_value = np.min(X[:, index])
+            max_value = np.max(X[:, index])
+            X[:, index] = (X[:, index] - min_value ) / (max_value) - min_value
+        return X
+
 

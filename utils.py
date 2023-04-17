@@ -73,3 +73,48 @@ def test_train_split(percentage, X, Y):
     xtrain = X[remaining_indices]
     ytrain = Y[remaining_indices]
     return xtest, ytest, xtrain, ytrain
+
+def confusion_matrix(ypredict, ytest):
+    tp = [0,0,0] # moderate, low, high
+    fp = [0,0,0]
+    fn = [0,0,0]
+    tn = [0,0,0]
+    
+    for index in range(ypredict.shape[0]):
+        if ypredict[index] == ytest[index]:
+            val = ypredict[index]
+            tp[val] = tp[val] + 1
+        else:
+            if ypredict[index] == 0:
+                if ytest[index] == 1:
+                    fn[1] = fn[1] + 1
+                    tn[2] = tn[2] + 1
+                else:
+                    fn[2] = fn[2] + 1
+                    tn[1] = tn[1] + 1
+                fp[0] = fp[0] + 1
+            elif ypredict[index] == 1:
+                if ytest[index] == 0:
+                    fn[0] = fn[0] + 1
+                    tn[2] = tn[2] + 1
+                else:
+                    fn[2] = fn[2] + 1
+                    tn[0] = tn[0] + 1
+                fp[1] = fp[1] + 1
+            else:
+                if ytest[index] == 1:
+                    fn[1] = fn[1] + 1
+                    tn[0] = tn[0] + 1
+                else:
+                    fn[0] = fn[0] + 1
+                    tn[1] = tn[1] + 1
+                fp[2] = fp[2] + 1
+
+    precision = [0,0,0]
+    recall = [0,0,0]
+    f1 = [0,0,0]
+    for index in range(3):
+        precision[index] = tp[index] / tp[index] + fp[index]
+        recall[index] = tp[index] / tp[index] + tn[index]
+        f1[index] = 2 * (precision[index] * recall[index]) / (precision[index] + recall[index])
+    return np.array([precision, recall, f1]).T
