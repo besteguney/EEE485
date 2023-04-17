@@ -3,6 +3,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import math
+#importing confusion matrix
+from sklearn.metrics import confusion_matrix
 
 class LogisticRegression:
     def __init__(self, lr, iteration, is_regularized=False, regularization_type=0, tune_param=0):
@@ -50,8 +52,15 @@ class LogisticRegression:
         self.sigmoid(prediction)
         return prediction
 
-    def mse(self, ypredict, ytest):
+    def error(self, ypredict, ytest):
         return np.sum(ypredict != ytest) / ypredict.shape[0]
+
+    def accuracy(self, ypredict, ytest):
+        score = 0
+        for index in range(ypredict.shape[0]):
+            if ypredict[index] == ytest[index]:
+                score = score + 1
+        return score / ypredict.shape[0]
 
     def k_fold_cross(self, df: pd.DataFrame, weight, n_fold=10):
         df = df.sample(frac=1)
@@ -96,8 +105,12 @@ class LogisticRegression:
 
             ypredict = self.classify(predict1, predict2, predict3)
                 
-            mse_score = self.mse(ypredict, ytest)
-            scores = scores + mse_score
+            error_score = self.error(ypredict, ytest)
+            scores = scores + error_score
             start_row = start_row + fold_size
             current_fold = current_fold - 1
-        return scores / n_fold  
+        
+        """confusion = confusion_matrix(ytest, ypredict)
+        print('Confusion Matrix\n')
+        print(confusion)"""
+        return scores / n_fold

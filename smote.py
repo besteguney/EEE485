@@ -24,11 +24,6 @@ class Smote:
         self.amount = amount
         self.n_neighbors = n_neighbors
 
-    """def nearest_neighbour(self, X):
-        nbs = NearestNeighbors(n_neighbors=self.n_neighbors,metric='euclidean',algorithm='kd_tree').fit(X)
-        euclidean,indices= nbs.kneighbors(X)
-        return indices"""
-
     def minority_samples(self):
         return self.data[self.data['Adaptivity Level'] == 2]
 

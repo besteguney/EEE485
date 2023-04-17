@@ -9,7 +9,7 @@ class Utils:
     def labeling(self, df):
         # Data Labeling
         columns = df.columns.tolist()
-        labeled_df = df
+        labeled_df = pd.DataFrame(columns=columns)
         self.mapping = []
 
         for column in columns:
@@ -22,7 +22,7 @@ class Utils:
         return labeled_df
 
     def one_hot_encoding(self, df: pd.DataFrame, column):
-        one_hot_df = pd.get_dummies(df, columns=[column])
+        one_hot_df = pd.get_dummies(df, columns=column)
         return one_hot_df
 
 def mse(ypredict, ytest):
@@ -61,3 +61,15 @@ def k_fold_cross(model, df: pd.DataFrame, n_fold=10):
         start_row = start_row + fold_size
         current_fold = current_fold - 1
     return scores / n_fold 
+
+def test_train_split(percentage, X, Y):
+    sample_size = int(X.shape[0] / 100) * percentage
+    test_indices = np.random.randint(X.shape[0], size=sample_size)
+    remaining_indices = np.delete(np.arange(X.shape[0]), test_indices)
+
+    xtest = X[test_indices]
+    ytest = Y[test_indices]
+
+    xtrain = X[remaining_indices]
+    ytrain = Y[remaining_indices]
+    return xtest, ytest, xtrain, ytrain

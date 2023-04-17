@@ -10,10 +10,6 @@ class PCA:
     def __init__(self, features):
         self.features = features
         self.eigen_vals, self.eigen_vecs = self.eigens(self.features)
-        
-    def normalize(self, features):
-        centered_features = features - np.mean(features, axis=0)
-        return centered_features
     
     def eigens(self, features):
         covariance_matrix = np.cov(self.features, rowvar=False)

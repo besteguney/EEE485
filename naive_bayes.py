@@ -7,7 +7,7 @@ import math
 class NaiveBayes:
     def fit(self, xtrain, ytrain):
         sample_size, feature_size = xtrain.shape
-        self.classes = np.unique(ytrain)
+        self.classes = [0,1,2]
         n_classes = 3
 
         # calculating mean, var, prior 
@@ -15,24 +15,24 @@ class NaiveBayes:
         self.var = np.zeros((n_classes, feature_size), dtype=np.float64)
         self.priors = np.zeros(n_classes, dtype=np.float64) # prior for each class
         
-        for idx, c in enumerate(self.classes):
-            indices = np.where(ytrain[:, 0] == c)[0]
-            x_c = xtrain[indices]
-            self.mean[idx, :] = x_c.mean(axis=0)
-            self.var[idx, :] = x_c.var(axis=0)
-            self.priors[idx] = x_c.shape[0] / float(sample_size) 
+        for index in range(n_classes):
+            indices = np.where(ytrain[:, 0] == index)[0]
+            x_class = xtrain[indices]
+            self.mean[index, :] = x_class.mean(axis=0)
+            self.var[index, :] = x_class.var(axis=0)
+            self.priors[index] = x_class.shape[0] / float(sample_size) 
 
     def predict(self, xtest):
-        y_predict = [self._predict(x) for x in xtest]
-        return np.array(y_predict)
+        ypredict = [self.predict_sample(x) for x in xtest]
+        return np.array(ypredict)
 
-    def _predict(self, xsample):
+    def predict_sample(self, xsample):
         posteriors = []
 
         # calculating posterior probability for each class
-        for idx, c in enumerate(self.classes):
-            prior = np.log(self.priors[idx])
-            posterior = np.sum(np.log(self.pdf(idx, xsample)))
+        for index in range(len(self.classes)):
+            prior = np.log(self.priors[index])
+            posterior = np.sum(np.log(self.pdf(index, xsample)))
             posterior = posterior + prior
             posteriors.append(posterior)
         
