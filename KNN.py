@@ -43,4 +43,3 @@ class KNN:
             X[:, index] = (X[:, index] - min_value ) / (max_value) - min_value
         return X
 
-

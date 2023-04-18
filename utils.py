@@ -72,7 +72,7 @@ def test_train_split(percentage, X, Y):
 
     xtrain = X[remaining_indices]
     ytrain = Y[remaining_indices]
-    return xtest, ytest, xtrain, ytrain
+    return xtest, ytest, xtrain, ytrain, test_indices, remaining_indices
 
 def confusion_matrix(ypredict, ytest):
     tp = [0,0,0] # moderate, low, high
