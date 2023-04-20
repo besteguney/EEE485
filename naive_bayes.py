@@ -5,9 +5,14 @@ import seaborn as sns
 import math
 
 class NaiveBayes:
+    def __init__(self):
+        self.classes = [0,1,2]
+        self.mean = []
+        self.var = []
+        self.priors = []
+        
     def fit(self, xtrain, ytrain):
         sample_size, feature_size = xtrain.shape
-        self.classes = [0,1,2]
         n_classes = 3
 
         # calculating mean, var, prior 
@@ -23,32 +28,28 @@ class NaiveBayes:
             self.priors[index] = x_class.shape[0] / float(sample_size) 
 
     def predict(self, xtest):
-        ypredict = [self.predict_sample(x) for x in xtest]
+        ypredict = np.zeros((xtest.shape[0], 1))
+        cur = 0
+
+        for x in xtest:
+            posteriors = [] # posteriors for point x
+            for index in range(len(self.classes)):
+                prior = np.log(self.priors[index])
+                posterior = np.sum(np.log(self.likelihood(index, x)))
+                posterior = posterior + prior
+                posteriors.append(posterior)
+            ypredict[cur] = self.classes[np.argmax(posteriors)]
+            cur = cur + 1
         return np.array(ypredict)
-
-    def predict_sample(self, xsample):
-        posteriors = []
-
-        # calculating posterior probability for each class
-        for index in range(len(self.classes)):
-            prior = np.log(self.priors[index])
-            posterior = np.sum(np.log(self.pdf(index, xsample)))
-            posterior = posterior + prior
-            posteriors.append(posterior)
-        
-        return self.classes[np.argmax(posteriors)]
     
-    def pdf(self, class_index, xsample):
+    ## Likelihood is gaussian
+    def likelihood(self, class_index, xsample):
         mean = self.mean[class_index]
         var = self.var[class_index]
-        
-        # gaussian likelihood
-        numerator = np.exp(- ((xsample - mean) ** 2) / (2 * var))
-        denominator = np.sqrt(2 * np.pi * var)
 
-        return numerator / denominator
+        return (np.exp(- ((xsample - mean) ** 2) / (2 * var))) / (np.sqrt(2 * np.pi * var))
 
-    def mse(self, ypredict, ytest):
+    def error(self, ypredict, ytest):
         score = 0
         for index in range(ypredict.shape[0]):
             if ypredict[index][0] != ytest[index][0]:
@@ -86,8 +87,8 @@ class NaiveBayes:
             self.fit(xtrain, ytrain)
             ypredict = self.predict(xtest)
                 
-            mse_score = self.mse(ypredict, ytest)
-            scores = scores + mse_score
+            error_score = self.error(ypredict, ytest)
+            scores = scores + error_score
             start_row = start_row + fold_size
             current_fold = current_fold - 1
         return scores / n_fold  

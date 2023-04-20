@@ -43,3 +43,39 @@ class KNN:
             X[:, index] = (X[:, index] - min_value ) / (max_value) - min_value
         return X
 
+    def error(self, ypredict, ytest):
+        score = 0
+        for index in range(ypredict.shape[0]):
+            if ypredict[index] != ytest[index][0]:
+                score = score + 1
+        return score / ypredict.shape[0]
+
+    def k_fold_cross(self, df: pd.DataFrame, n_fold=10):
+        df = df.sample(frac=1)
+        fold_size = int(df.shape[0] / n_fold)
+        start_row = 0
+        scores = 0
+        current_fold = n_fold
+
+        # Converting data frame to numpy array
+        x_matrix = df.iloc[:, :-1].values
+        x_matrix = x_matrix.astype(float)
+        y_vector = df.iloc[:, -1:].values
+
+        while current_fold > 0:
+            xtest = x_matrix[start_row:start_row + fold_size]
+            ytest = y_vector[start_row:start_row + fold_size]
+
+            train1 = x_matrix[0:start_row]
+            train2 = x_matrix[start_row + fold_size:]
+            xtrain = np.concatenate((train1, train2), axis=0)
+            ytrain = np.concatenate((y_vector[0:start_row], y_vector[start_row + fold_size:]), axis=0)
+
+            self.fit(xtrain, ytrain)
+            ypredict = self.predict(xtest)
+                    
+            error_score = error(ypredict, ytest)
+            scores = scores + error_score
+            start_row = start_row + fold_size
+            current_fold = current_fold - 1
+        return scores / n_fold 

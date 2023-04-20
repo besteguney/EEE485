@@ -109,8 +109,5 @@ class LogisticRegression:
             scores = scores + error_score
             start_row = start_row + fold_size
             current_fold = current_fold - 1
-        
-        """confusion = confusion_matrix(ytest, ypredict)
-        print('Confusion Matrix\n')
-        print(confusion)"""
+
         return scores / n_fold
