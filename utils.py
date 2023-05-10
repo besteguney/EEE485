@@ -55,3 +55,28 @@ def precision_recall(ypredict, ytest):
             else:
                 df.iloc[0, 2-val] = df.iloc[0, 2-val] + 1
     return df
+
+def chi2_square(df, col):
+    contingency_table = pd.crosstab(df[col], df['Adaptivity Level'])
+    contingency_table.loc['total'] = contingency_table.sum(axis=0)
+    contingency_table['total'] = contingency_table.sum(axis=1)
+
+    ## calculating for expected value
+    expected_val = contingency_table.copy()
+    for row_index in range(contingency_table.shape[0] - 1):
+        for column_index in range(contingency_table.shape[1] - 1):
+            total_1 = contingency_table.loc['total', column_index] 
+            total_2 = contingency_table.loc[row_index, 'total'] 
+            expected_val.iloc[row_index, column_index] = (total_1 * total_2) / (total_1 + total_2)
+    expected_val.loc['total'] = expected_val.sum(axis=0) - contingency_table.loc['total']
+    expected_val['total'] = expected_val.sum(axis=1) - contingency_table['total']
+
+    x2_table = contingency_table.copy()
+    for row_index in range(contingency_table.shape[0] - 1):
+        for column_index in range(contingency_table.shape[1] - 1):
+            x2_table.iloc[row_index, column_index] = (contingency_table.iloc[row_index, column_index] - expected_val.iloc[row_index, column_index]) ** 2
+            x2_table.iloc[row_index, column_index] = x2_table.iloc[row_index, column_index] / expected_val.iloc[row_index, column_index]
+    x2_table.loc['total'] = x2_table.sum(axis=0) - contingency_table.loc['total']
+    x2_table['total'] = x2_table.sum(axis=1) - contingency_table['total']
+
+    return x2_table.loc['total', 'total'], (contingency_table.shape[0] - 2) * (contingency_table.shape[1] - 2)

@@ -34,8 +34,9 @@ class LogisticRegression:
         if self.is_regularized:
             if self.regular_type == 2:
                 return ((features.T @ (prediction - labels)) + (self.tune_param * np.sum(weight) )) / sample_size
-            else:
-                return ((features.T @ (prediction - labels)) + (self.tune_param * np.sum(np.abs(weight))) ) / sample_size
+            #else:
+                # To Do in Final: I could not take the derivative of absolute value
+                #return ((features.T @ (prediction - labels)) + (self.tune_param * np.sum(np.abs(weight))) ) / sample_size
         return (features.T @ (prediction - labels)) / sample_size
 
     def gradient_descent(self, features, labels, weight):
