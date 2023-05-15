@@ -5,19 +5,17 @@ from decision_node import TreeNode
 
 class Tree():
     # Providing some stopping conditions
-    def __init__(self, max_depth=10, min_split=2, min_inpurity=0.1, n_features=None, root_node=None):
+    def __init__(self, max_depth=10, min_split=2, n_features=None, root_node=None, mode=1):
         self.max_depth = max_depth
         self.min_split = min_split
-        self.min_inpurity = min_inpurity
         self.n_features = n_features
         self.root_node = root_node
+        self.mode = mode 
 
     def predict(self, X):
         return np.array([self.predict_sample(xsample, self.root_node) for xsample in X])
 
     def predict_sample(self, xsample, node):
-        
-
         if node.is_leaf():
             return node.val
         
@@ -45,6 +43,32 @@ class Tree():
             if probability > 0:
                 sum = sum + (probability * np.log(probability))
         return -sum
+
+    def gini_index(self, labels):
+        n_sample = len(labels)
+        arr_label = [0, 0, 0]
+        for label in labels:
+            arr_label[label] = arr_label[label] + 1
+        
+        arr = np.array(arr_label)
+        probabilities = arr / n_sample
+        sum = 0
+        for probability in probabilities:
+            if probability > 0:
+                sum = sum + (probability * (1 - probability))
+        return 1 - sum
+
+    def calculate_impurity(self, feature, labels, threshold):
+        node_impurity = self.gini_index(labels)
+        l_child, r_child = self.split_node(feature, threshold)
+        n_labels = len(labels)
+
+        if len(l_child) == 0 or len(r_child) == 0:
+            return 0
+        left_impurity = self.gini_index(labels[l_child])
+        right_impurity = self.gini_index(labels[r_child])
+        child_impurity = (len(l_child) / n_labels) * left_impurity + (len(r_child) / n_labels) * right_impurity
+        return node_impurity - child_impurity
 
     def calculate_gain(self, feature, labels, threshold):
         node_entropy = self.entropy(labels)
@@ -85,6 +109,28 @@ class Tree():
 
 
     def find_best_split(self, X, Y, indices):
+        if self.mode == 1:
+            return self.find_best_split_entropy(X, Y, indices)
+        else:
+            return self.find_best_split_gini(X, Y, indices)
+
+    def find_best_split_gini(self, X, Y, indices):
+        min_impurity, min_index, min_threshold = 2, None, None
+
+        for index in indices:
+            cur_feature = X[:, index]
+            values = np.unique(cur_feature)
+
+            for val in values:
+                cur_impurity = self.calculate_impurity(cur_feature, Y, val)
+                if cur_impurity < min_impurity:
+                    min_impurity = cur_impurity
+                    min_index = index
+                    min_threshold = val
+
+        return min_threshold, min_index
+
+    def find_best_split_entropy(self, X, Y, indices):
         max_gain, max_index, max_threshold = -1, None, None
 
         for index in indices:

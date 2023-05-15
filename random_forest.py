@@ -3,12 +3,12 @@ import numpy as np
 from decision_trees import Tree
 
 class RandomForest():
-    def __init__(self, max_depth=10, min_split=2, min_inpurity=0.1, n_features=10, n_trees=10):
+    def __init__(self, max_depth=10, min_split=2, n_features=10, n_trees=10, mode=1):
         self.max_depth = max_depth
         self.min_split = min_split
-        self.min_inpurity = min_inpurity
         self.n_features = n_features
         self.n_trees = n_trees
+        self.mode = mode
     
     def predict(self, xtest):
         predictions = np.array([tree.predict(xtest) for tree in self.tree_list])
@@ -25,7 +25,7 @@ class RandomForest():
     def fit(self, x_train, y_train):
         self.tree_list = []
         for index in range(self.n_trees):
-            decision_tree = Tree(max_depth=self.max_depth, min_split=self.min_split, min_inpurity=self.min_inpurity, n_features=self.n_features)
+            decision_tree = Tree(max_depth=self.max_depth, min_split=self.min_split, n_features=self.n_features, mode=self.mode)
 
             sampled_indeces = self.bagging(x_train, y_train)
             x_sampled = x_train[sampled_indeces]
@@ -41,4 +41,10 @@ class RandomForest():
         indeces = np.random.choice(n_samples, n_samples, replace=True)
         return indeces
 
+    def accuracy(self, ypredict, ytest):
+        score = 0
+        for index in range(len(ypredict)):
+            if ytest[index] == ypredict[index]:
+                score = score + 1
+        return score / len(ypredict)
 
