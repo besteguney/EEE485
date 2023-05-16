@@ -80,3 +80,38 @@ def chi2_square(df, col):
     x2_table['total'] = x2_table.sum(axis=1) - contingency_table['total']
 
     return x2_table.loc['total', 'total'], (contingency_table.shape[0] - 2) * (contingency_table.shape[1] - 2)
+
+## Feature ranking with mutual information
+def find_mutual(X, feature_index, Y):
+    return mutual_information(X[:, feature_index], Y)
+
+
+def mutual_information(X, Y):
+    features = np.unique(X)
+    labels = np.unique(Y)
+    print
+    sum = 0
+
+    for label in labels:
+        indices = np.where(Y==label)
+        print(f'indices are: \n {indices}')
+        cur_y = Y[indices]
+        cur_x = X[indices]
+
+        for feature in features:
+            x_indices = np.where(cur_x == feature)
+            print(f'x_indices are: \n {x_indices}')
+            print(f'len of x indices {len(x_indices)}')
+            cur_x = cur_x[indices] 
+            joint_probability = len(cur_x) / len(Y) 
+            feature_indices = np.where(X == feature)
+            marginal_x = (len(X[feature_indices]) / len(Y)) 
+            marginal_y = (len(cur_y) / len(Y))
+            log_probability = np.log(joint_probability / (marginal_x * marginal_y))
+            sum = sum + joint_probability * log_probability
+    return sum
+    
+
+
+
+
