@@ -85,31 +85,61 @@ def chi2_square(df, col):
 def find_mutual(X, feature_index, Y):
     return mutual_information(X[:, feature_index], Y)
 
-
 def mutual_information(X, Y):
     features = np.unique(X)
     labels = np.unique(Y)
-    print
     sum = 0
 
     for label in labels:
-        indices = np.where(Y==label)
-        print(f'indices are: \n {indices}')
+        indices = np.where(Y == label)[0]
         cur_y = Y[indices]
         cur_x = X[indices]
-
         for feature in features:
-            x_indices = np.where(cur_x == feature)
-            print(f'x_indices are: \n {x_indices}')
-            print(f'len of x indices {len(x_indices)}')
-            cur_x = cur_x[indices] 
-            joint_probability = len(cur_x) / len(Y) 
-            feature_indices = np.where(X == feature)
+            x_indices = np.where(cur_x == feature)[0]
+            cur = cur_x[x_indices] 
+            joint_probability = len(cur) / len(Y)
+            if joint_probability == 0:
+                continue
+            
+            feature_indices = np.where(X == feature)[0]
             marginal_x = (len(X[feature_indices]) / len(Y)) 
             marginal_y = (len(cur_y) / len(Y))
-            log_probability = np.log(joint_probability / (marginal_x * marginal_y))
+            log_probability = math.log(joint_probability / (marginal_x * marginal_y))
             sum = sum + joint_probability * log_probability
     return sum
+
+def mrmr(X, Y, n_features):
+    chosen = []
+    
+    for _ in range(n_features):
+        remaining_indices = []
+        for index in range(X.shape[1]):
+            if index not in chosen:
+                remaining_indices.append(index)
+        max_relevance = -1
+        max_index = -1
+        
+        for index in remaining_indices:
+            cur_column = X[:, index]
+            relevance = find_mutual(X, index, Y)
+            redundancy = 0
+            
+            for item in chosen:
+                column = X[:, index]
+                redundancy = redundancy + find_mutual(X, index, column)
+                
+            if len(chosen) != 0:
+                average_redundancy = redundancy / len(chosen)
+            else:
+                average_redundancy = 0
+            
+            mrmr_val = relevance - average_redundancy
+            if mrmr_val > max_relevance:
+                max_relevance = mrmr_val 
+                max_index = index
+            
+        chosen.append(max_index)
+    return chosen
     
 
 
