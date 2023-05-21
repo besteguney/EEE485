@@ -5,9 +5,8 @@ from decision_node import TreeNode
 
 class Tree():
     # Providing some stopping conditions
-    def __init__(self, max_depth=10, min_split=2, n_features=None, root_node=None, mode=1):
+    def __init__(self, max_depth=10, n_features=None, root_node=None, mode=1):
         self.max_depth = max_depth
-        self.min_split = min_split
         self.n_features = n_features
         self.root_node = root_node
         self.mode = mode 
@@ -26,7 +25,10 @@ class Tree():
 
     
     def fit(self, x_train, y_train, cur_depth=0):
-        self.n_features = x_train.shape[1] if not self.n_features else min(x_train.shape[1],self.n_features)
+        if self.n_features == None:
+            self.n_features = x_train.shape[1]
+        else:
+            self.n_features = min(x_train.shape[1],self.n_features)
         self.root_node = self.enlarge(x_train, y_train, cur_depth)
 
     ## helper methods
@@ -34,6 +36,7 @@ class Tree():
         n_sample = len(labels)
         arr_label = [0, 0, 0]
         for label in labels:
+            label = int(label)
             arr_label[label] = arr_label[label] + 1
         
         arr = np.array(arr_label)
@@ -48,6 +51,7 @@ class Tree():
         n_sample = len(labels)
         arr_label = [0, 0, 0]
         for label in labels:
+            label = int(label)
             arr_label[label] = arr_label[label] + 1
         
         arr = np.array(arr_label)
@@ -87,10 +91,11 @@ class Tree():
         n_sample, n_features =  x_train.shape
         labels = np.unique(y_train)
 
-        if (cur_depth >= self.max_depth or n_sample < self.min_split or len(labels) == 1) :
+        if (cur_depth >= self.max_depth or n_sample < 2 or len(labels) == 1) :
             # maximum value
             arr_label = [0, 0, 0]
             for val in y_train:
+                val = int(val)
                 arr_label[val] = arr_label[val] + 1
             leaf_val = np.argmax(arr_label)
             return TreeNode(l_child=None, r_child=None, val=leaf_val)

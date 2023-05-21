@@ -3,9 +3,8 @@ import numpy as np
 from decision_trees import Tree
 
 class RandomForest():
-    def __init__(self, max_depth=10, min_split=2, n_features=10, n_trees=10, mode=1):
+    def __init__(self, max_depth=10, n_features=10, n_trees=10, mode=1):
         self.max_depth = max_depth
-        self.min_split = min_split
         self.n_features = n_features
         self.n_trees = n_trees
         self.mode = mode
@@ -25,7 +24,7 @@ class RandomForest():
     def fit(self, x_train, y_train):
         self.tree_list = []
         for index in range(self.n_trees):
-            decision_tree = Tree(max_depth=self.max_depth, min_split=self.min_split, n_features=self.n_features, mode=self.mode)
+            decision_tree = Tree(max_depth=self.max_depth, n_features=self.n_features, mode=self.mode)
 
             sampled_indeces = self.bagging(x_train, y_train)
             x_sampled = x_train[sampled_indeces]
@@ -47,4 +46,42 @@ class RandomForest():
             if ytest[index] == ypredict[index]:
                 score = score + 1
         return score / len(ypredict)
+
+    def error(self, ypredict, ytest):
+        score = 0
+        for index in range(len(ypredict)):
+            if ytest[index] != ypredict[index]:
+                score = score + 1
+        return score / len(ypredict)
+    
+    def k_fold_cross(self, df: pd.DataFrame, n_fold=10):
+        df = df.sample(frac=1)
+        fold_size = int(df.shape[0] / n_fold)
+        start_row = 0
+        scores = 0
+        current_fold = n_fold
+
+        # Converting data frame to numpy array
+        x_matrix = df.iloc[:, :-1].values
+        x_matrix = x_matrix.astype(int)
+        y_vector = df.iloc[:, -1:].values
+        y_vector = y_vector.astype(int)
+
+        while current_fold > 0:
+            xtest = x_matrix[start_row:start_row + fold_size]
+            ytest = y_vector[start_row:start_row + fold_size]
+
+            train1 = x_matrix[0:start_row]
+            train2 = x_matrix[start_row + fold_size:]
+            xtrain = np.concatenate((train1, train2), axis=0)
+            ytrain = np.concatenate((y_vector[0:start_row], y_vector[start_row + fold_size:]), axis=0)
+            
+            self.fit(xtrain, ytrain)
+            ypredict = self.predict(xtest)
+                
+            error_score = self.error(ypredict, ytest)
+            scores = scores + error_score
+            start_row = start_row + fold_size
+            current_fold = current_fold - 1
+        return scores / n_fold  
 

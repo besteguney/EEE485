@@ -280,7 +280,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "4512ab71",
+   "id": "1c6b9f59",
    "metadata": {},
    "source": [
     "## Feature Engineering"
@@ -796,7 +796,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "6fe36b8e",
+   "id": "1b10c0ec",
    "metadata": {},
    "source": [
     "## Feature Selection"
@@ -804,7 +804,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "e7e6843a",
+   "id": "1d9d9a05",
    "metadata": {},
    "source": [
     "### Chi2 Test"
@@ -813,7 +813,7 @@
   {
    "cell_type": "code",
    "execution_count": 11,
-   "id": "668dac85",
+   "id": "89a534bf",
    "metadata": {},
    "outputs": [
     {
@@ -845,7 +845,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "90ef1e9f",
+   "id": "51af3b9c",
    "metadata": {},
    "source": [
     "#### Maximum Relevancy Minimum Redundancy"
@@ -854,7 +854,7 @@
   {
    "cell_type": "code",
    "execution_count": 12,
-   "id": "04509648",
+   "id": "79ec1060",
    "metadata": {},
    "outputs": [
     {
@@ -872,7 +872,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "31132827",
+   "id": "77134af1",
    "metadata": {},
    "source": [
     "## Machine Learning Models"
@@ -880,7 +880,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "d85c5642",
+   "id": "25cc7110",
    "metadata": {},
    "source": [
     "### 1. Logistic Regression"
@@ -936,7 +936,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "3a48facf",
+   "id": "7581bd1b",
    "metadata": {},
    "source": [
     "#### Logistic Regression with No Feature Selection"
@@ -976,7 +976,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "b80afa8a",
+   "id": "1b4efbe0",
    "metadata": {},
    "source": [
     "#### Maximum Relevancy Minimum Redundancy"
@@ -985,7 +985,7 @@
   {
    "cell_type": "code",
    "execution_count": 15,
-   "id": "180c1f40",
+   "id": "f797704e",
    "metadata": {},
    "outputs": [
     {
@@ -1082,7 +1082,7 @@
   {
    "cell_type": "code",
    "execution_count": 16,
-   "id": "4cb0ad0b",
+   "id": "f7e54d83",
    "metadata": {},
    "outputs": [
     {
@@ -1936,7 +1936,7 @@
   {
    "cell_type": "code",
    "execution_count": 13,
-   "id": "26c0a8b6",
+   "id": "fd388fbe",
    "metadata": {},
    "outputs": [
     {
@@ -2755,6 +2755,211 @@
     "plt.xlabel('Number of Features')\n",
     "plt.ylabel('Rate')"
    ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 44,
+   "id": "7536f57e",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "(51,)"
+      ]
+     },
+     "execution_count": 44,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "labeled_df.iloc[:,1][labeled_df.iloc[:,1] == 4].shape"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 13,
+   "id": "176badff",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "(1205, 13)"
+      ]
+     },
+     "execution_count": 13,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "X_labeled.shape"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 14,
+   "id": "8f913df8",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "(1205,)"
+      ]
+     },
+     "execution_count": 14,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "Y_labeled.shape"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 12,
+   "id": "7495fbcb",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import math\n",
+    "## Feature ranking with mutual information\n",
+    "def find_mutual(X, feature_index, Y):\n",
+    "    return mutual_information(X[:, feature_index], Y)\n",
+    "\n",
+    "def mutual_information(X, Y):\n",
+    "    features = np.unique(X)\n",
+    "    labels = np.unique(Y)\n",
+    "    sum = 0\n",
+    "\n",
+    "    for label in labels:\n",
+    "        indices = np.where(Y == label)[0]\n",
+    "        cur_y = Y[indices]\n",
+    "        cur_x = X[indices]\n",
+    "        for feature in features:\n",
+    "            x_indices = np.where(cur_x == feature)[0]\n",
+    "            cur = cur_x[x_indices] \n",
+    "            joint_probability = len(cur) / len(Y)\n",
+    "            if joint_probability == 0:\n",
+    "                continue\n",
+    "            \n",
+    "            feature_indices = np.where(X == feature)[0]\n",
+    "            marginal_x = (len(X[feature_indices]) / len(Y)) \n",
+    "            marginal_y = (len(cur_y) / len(Y))\n",
+    "            log_probability = math.log(joint_probability / (marginal_x * marginal_y))\n",
+    "            sum = sum + joint_probability * log_probability\n",
+    "    return sum"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 19,
+   "id": "fa9937bd",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "def mrmr(X, Y, n_features):\n",
+    "    chosen = []\n",
+    "    \n",
+    "    for _ in range(n_features):\n",
+    "        remaining_indices = []\n",
+    "        for index in range(X.shape[1]):\n",
+    "            if index not in chosen:\n",
+    "                remaining_indices.append(index)\n",
+    "        max_relevance = -1\n",
+    "        max_index = -1\n",
+    "        \n",
+    "        for index in remaining_indices:\n",
+    "            cur_column = X[:, index]\n",
+    "            relevance = find_mutual(X, index, Y)\n",
+    "            redundancy = 0\n",
+    "            \n",
+    "            for item in chosen:\n",
+    "                column = X[:, index]\n",
+    "                redundancy = redundancy + find_mutual(X, index, column)\n",
+    "                \n",
+    "            if len(chosen) != 0:\n",
+    "                average_redundancy = redundancy / len(chosen)\n",
+    "            else:\n",
+    "                average_redundancy = 0\n",
+    "            \n",
+    "            mrmr_val = relevance - average_redundancy\n",
+    "            if mrmr_val > max_relevance:\n",
+    "                max_relevance = mrmr_val \n",
+    "                max_index = index\n",
+    "            \n",
+    "        chosen.append(max_index)\n",
+    "    return chosen"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 20,
+   "id": "b393af74",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "0.005755140666605228\n",
+      "0.05119715965368992\n",
+      "0.018326687442350376\n",
+      "0.044126826528788014\n",
+      "0.00831724026202121\n",
+      "0.03421205245721401\n",
+      "0.0040766330602899975\n",
+      "0.0641492123456742\n",
+      "0.008627763382931843\n",
+      "0.01316897863768029\n",
+      "0.10253100775043669\n",
+      "0.012308183468191613\n",
+      "0.021601104690650595\n"
+     ]
+    }
+   ],
+   "source": [
+    "for index in range(0,13):\n",
+    "    print(find_mutual(X_labeled, index, Y_labeled))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 24,
+   "id": "9f1ab378",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[10, 6, 11, 12, 5, 4, 3, 8]\n"
+     ]
+    }
+   ],
+   "source": [
+    "print(mrmr(X_labeled, Y_labeled, 8))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "2e9f032f",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "bbcd733f",
+   "metadata": {},
+   "outputs": [],
+   "source": []
   }
  ],
  "metadata": {

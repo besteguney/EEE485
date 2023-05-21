@@ -3,7 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import math
-#importing confusion matrix
+import itertools
 from sklearn.metrics import confusion_matrix
 
 class LogisticRegression:
@@ -112,3 +112,20 @@ class LogisticRegression:
             current_fold = current_fold - 1
 
         return scores / n_fold
+    
+    def set_selection(self, df: pd.DataFrame, size):
+        n_features = df.shape[1] - 3
+        indeces = range(0, n_features)
+        combinations = itertools.combinations(indeces, size)
+        results = pd.DataFrame(columns=['Combination', 'K-Fold-Error'])
+
+        for index, combination in enumerate(combinations):
+            combination = list(combination)
+            weight = np.zeros((len(combination),1))
+            new_df = df.iloc[:, combination].copy()
+            new_df = pd.concat([new_df, df.iloc[:, -3:]], axis=1)
+            results.loc[index, 'Combination'] = combination
+            results.loc[index, 'K-Fold-Error'] = self.k_fold_cross(new_df, weight)
+
+        return results
+

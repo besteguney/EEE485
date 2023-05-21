@@ -6,8 +6,9 @@ import math
 from smote import euclidean_distance
 
 class KNN:
-    def __init__(self, n_neighbors=5):
+    def __init__(self, n_neighbors=5, mode=1):
         self.n_neighbors = n_neighbors
+        self.mode = mode
     
     def fit(self, xtrain, ytrain):
         self.xtrain = xtrain
@@ -18,7 +19,11 @@ class KNN:
         return np.array(ypredict)
 
     def predict_sample(self, x):
-        distances = [euclidean_distance(x, sample) for sample in self.xtrain]
+        distances = []
+        if self.mode == 1:
+            distances = [euclidean_distance(x, sample) for sample in self.xtrain]
+        else:
+            distances = [self.manhattan_distance(x, sample) for sample in self.xtrain]
         neigbor_indices = np.argsort(distances)[:self.n_neighbors]
         neigbor_labels = [self.ytrain[index] for index in neigbor_indices]
         neigbor_count = [0,0,0]
@@ -33,6 +38,13 @@ class KNN:
             if ypredict[index] == ytest[index]:
                 score = score + 1
         return score / ypredict.shape[0]
+
+    def manhattan_distance(self, x1, x2):
+        n_features = len(x1)
+        sum = 0
+        for index in range(n_features):
+            sum = sum + abs(x1[index] - x2[index])
+        return sum
     
     def min_max_scaling(self, xtrain):
         X = xtrain.copy()

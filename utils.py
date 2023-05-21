@@ -116,7 +116,7 @@ def mrmr(X, Y, n_features):
         for index in range(X.shape[1]):
             if index not in chosen:
                 remaining_indices.append(index)
-        max_relevance = -1
+        max_relevance = -100
         max_index = -1
         
         for index in remaining_indices:
