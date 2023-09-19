@@ -1,5 +1,3 @@
 # EEE485
 Statistical Learning and Data Analytics 
-Beste Guney
-21901631
-Section 01
+Analysing the student's adaptibility level in online education and applying machine learning methods to make predictions.
